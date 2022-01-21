@@ -3,3 +3,4 @@
 内附带测试常量，可以直接测试
 函数带有详细使用规则
 目前业务只需要使用掌握：Reg、TotalSupplyPost、UserNFTsPost、AdminCreateNFTPost、AdminCreateNFTBatchPost、AdminTransferNFTBatchPost、TransferFromPost
+其他的后续掌握也可以
