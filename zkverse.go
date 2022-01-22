@@ -238,7 +238,7 @@ func TotalSupplyPost(IPandPort string, actionName string, myappid string, flag s
  * @test: 本函数为【查询类函数】，只读取区块链信息，不写入和改变区块链信息
  * @msg:查询指定用户区块链地址的所有NFT持有情况
  * @param {string} IPandPort 密钥系统请求链接 例如 https://127.0.0.1:13149
- * @param {string} actionName 请求名称，同样名称的含义也是请求的功能，注意区分ETH和Conflux。本参数传入：CFX_UserNFTsPost代表conflux区块链上的合约，ETH_UserNFTsPost代表以太坊及其侧链、L2的合约
+ * @param {string} actionName 请求名称，同样名称的含义也是请求的功能，注意区分ETH和Conflux。本参数传入：CFX_UserNFTs代表conflux区块链上的合约，ETH_UserNFTs代表以太坊及其侧链、L2的合约
  * @param {string} myappid 项目认证的APPID 例如 0xd67c9aed16df25b21055993449229fa895c67eb87bb1d7130c38cc469d8625b5
  * @param {string} From 被查询用户的区块链地址
  * @param {string} flag 标记，用于同一地址区块链并发交易使用，通常就填写本函数名称{UserNFTsPost}
