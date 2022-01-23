@@ -100,6 +100,14 @@ type UserRegitRes_Message struct {
 	Confluxaddress string `json:"ConfluxAddress"`
 	ETHaddress     string `json:"ETHAddress"`
 }
+type UserRegitByPrivateKey_Message struct {
+	Sha256Value []byte `json:"sha256value"`
+	Appid       []byte `json:"appid"`
+	Time        []byte `json:"emit"`
+	Token       []byte `json:"token"`
+	Data        []byte `json:"data"`
+	PRK         []byte `json:"PRK"`
+}
 
 var body []byte
 
@@ -111,6 +119,33 @@ const TestAdministratorPassword string = "!!@@qinfengdx"                        
 const TestCFXAdministratorAddress string = "cfxtest:aatpg41yksf8rm5nzf7thr23jdk9hsfzhe9hv6gdwa" //测试专用
 const TestETHAdministratorAddress string = "0xfec36af44b8be6AB6ba97aF3b71940D3f3B8B539"         //测试专用
 var publickey []byte
+
+/**
+ * @name:RegByPrivateKey
+ * @test: 同步私钥和区块链支付密码
+ * @msg:用户同步私钥和区块链支付密码 至ZKverse密钥托管系统账户
+ * @param {string} IPandPort 密钥系统请求链接 例如 https://127.0.0.1:13149
+ * @param {string} APPID 项目认证的APPID 例如 0xd67c9aed16df25b21055993449229fa895c67eb87bb1d7130c38cc469d8625b5
+ * @param {string} RegPassword 用户同步的二级支付密码
+ * @param {string} RegPrivateKey 用户同步私钥
+ * @param {string} flag 标记，用于同一地址区块链并发交易使用，通常就填写本函数名称{Reg}
+ * @return {*}conflux地址，ETH地址
+ */
+func RegByPrivateKey(IPandPort string, APPID string, RegPassword string, RegPrivateKey string, flag string) (string, string, error) {
+	body, err := regitPrkPost(IPandPort, "UserRegitByPrivateKey", APPID, RegPassword, RegPrivateKey, flag)
+	if err != nil {
+		return string(body), string(body), err
+	}
+	fmt.Println(string(body))
+	res := &UserRegitRes_Message{}
+	err = json.Unmarshal(body, res)
+	if err != nil {
+		return err.Error(), err.Error(), err
+	}
+	fmt.Println("Confluxaddress:", res.Confluxaddress)
+	fmt.Println("ETHaddress:", res.ETHaddress)
+	return res.Confluxaddress, res.ETHaddress, nil
+}
 
 /**
  * @name:Reg
@@ -170,6 +205,39 @@ func regitPost(IPandPort string, actionName string, myappid string, Password str
 	src_Password := publicEncode([]byte(Password), publickey)
 	//post请求提交json数据
 	messages := UserRegit_Message{sha256Value, src_appid, src_mytime, src_token, src_Password}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte(""), err
+	}
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+	resp, err := client.Post(IPandPort+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		body, err := ioutil.ReadAll(resp.Body)
+		return body, err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return body, err
+	}
+	return body, nil
+}
+func regitPrkPost(IPandPort string, actionName string, myappid string, Password string, PrivateKey string, flag string) ([]byte, error) {
+	now := uint64(time.Now().Unix())    //获取当前时间
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	sha256Value := []byte(CalculateHashcode(myappid)) //APPID的sha256
+	src_appid := publicEncode([]byte(myappid), publickey)
+	src_mytime := publicEncode([]byte(by), publickey)
+	src_token := publicEncode([]byte(fmt.Sprint(time.Now().UnixNano())+myappid+flag), publickey)
+	src_Password := publicEncode([]byte(Password), publickey)
+	src_PRK := publicEncode([]byte(PrivateKey), publickey)
+	//post请求提交json数据
+	messages := UserRegitByPrivateKey_Message{sha256Value, src_appid, src_mytime, src_token, src_Password, src_PRK}
 	ba, err := json.Marshal(messages)
 	if err != nil {
 		return []byte(""), err
