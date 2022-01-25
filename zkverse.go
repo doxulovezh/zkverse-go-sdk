@@ -108,6 +108,14 @@ type UserRegitByPrivateKey_Message struct {
 	Data        []byte `json:"data"`
 	PRK         []byte `json:"PRK"`
 }
+type UserNFTUri_Message struct {
+	Sha256Value []byte `json:"sha256value"`
+	Appid       []byte `json:"appid"`
+	Time        []byte `json:"emit"`
+	Token       []byte `json:"token"`
+	ID          []byte `json:"id"`
+	ChainType   []byte `json:"chainType"`
+}
 
 var body []byte
 
@@ -294,6 +302,100 @@ func TotalSupplyPost(IPandPort string, actionName string, myappid string, flag s
 		},
 	}
 	resp, err := client.Post(IPandPort+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		body, err := ioutil.ReadAll(resp.Body)
+		return []byte("http error:" + fmt.Sprint(err) + "internel:" + string(body)), err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error"), err
+	}
+	return body, nil
+}
+
+/**
+ * @name:UserNFTURIPost
+ * @test: 本函数为【查询类函数】，只读取区块链信息，不写入和改变区块链信息
+ * @msg:查询NFT的uri元数据链接
+ * @param {string} IPandPort  密钥系统请求链接 例如 https://127.0.0.1:13149
+ * @param {string} actionName 请求名称，同样名称的含义也是请求的功能，注意区分ETH和Conflux。本参数传入：CFX_TokenUri代表conflux区块链上的合约，ETH_TokenUri代表以太坊及其侧链、L2的合约
+ * @param {string} myappid 项目认证的APPID 例如 0xd67c9aed16df25b21055993449229fa895c67eb87bb1d7130c38cc469d8625b5
+ * @param {string} id NFT的ID
+ * @param {string} flag 标记，用于同一地址区块链并发交易使用，通常就填写本函数名称{TotalSupplyPost}
+ * @param {string} ChainType 区块链类型，参数：cfx代表conflux  eth代表以太坊  bsc代表币安链  arb代表以太坊L2 Arbitrum，注意全部为小写字母哦
+ * @return {*}https://xxxxxxx的字符串表示
+ */
+func UserNFTURIPost(thurl string, actionName string, myappid string, id string, flag string, ChainType string) ([]byte, error) {
+	now := uint64(time.Now().Unix())    //获取当前时间
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	sha256Value := []byte(CalculateHashcode(myappid)) //APPID的sha256
+	src_appid := publicEncode([]byte(myappid), publickey)
+	src_mytime := publicEncode([]byte(by), publickey)
+	src_token := publicEncode([]byte(fmt.Sprint(time.Now().UnixNano())+myappid+flag), publickey)
+
+	src_ID := publicEncode([]byte(id), publickey)
+	src_ChainType := publicEncode([]byte(ChainType), publickey)
+	//post请求提交json数据
+	messages := UserNFTUri_Message{sha256Value, src_appid, src_mytime, src_token, src_ID, src_ChainType}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error"), err
+	}
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+	resp, err := client.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		body, err := ioutil.ReadAll(resp.Body)
+		return []byte("http error:" + fmt.Sprint(err) + "internel:" + string(body)), err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error"), err
+	}
+	return body, nil
+}
+
+/**
+ * @name:UserNFTURIPost
+ * @test: 本函数为【查询类函数】，只读取区块链信息，不写入和改变区块链信息
+ * @msg:查询NFT的所有者地址
+ * @param {string} IPandPort  密钥系统请求链接 例如 https://127.0.0.1:13149
+ * @param {string} actionName 请求名称，同样名称的含义也是请求的功能，注意区分ETH和Conflux。本参数传入：CFX_OwnerOf代表conflux区块链上的合约，ETH_OwnerOf代表以太坊及其侧链、L2的合约
+ * @param {string} myappid 项目认证的APPID 例如 0xd67c9aed16df25b21055993449229fa895c67eb87bb1d7130c38cc469d8625b5
+ * @param {string} id NFT的ID
+ * @param {string} flag 标记，用于同一地址区块链并发交易使用，通常就填写本函数名称{TotalSupplyPost}
+ * @param {string} ChainType 区块链类型，参数：cfx代表conflux  eth代表以太坊  bsc代表币安链  arb代表以太坊L2 Arbitrum，注意全部为小写字母哦
+ * @return {*}https://xxxxxxx的字符串表示
+ */
+func OwnerOfPost(thurl string, actionName string, myappid string, id string, flag string, ChainType string) ([]byte, error) {
+	now := uint64(time.Now().Unix())    //获取当前时间
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	sha256Value := []byte(CalculateHashcode(myappid)) //APPID的sha256
+	src_appid := publicEncode([]byte(myappid), publickey)
+	src_mytime := publicEncode([]byte(by), publickey)
+	src_token := publicEncode([]byte(fmt.Sprint(time.Now().UnixNano())+myappid+flag), publickey)
+
+	src_ID := publicEncode([]byte(id), publickey)
+	src_ChainType := publicEncode([]byte(ChainType), publickey)
+	//post请求提交json数据
+	messages := UserNFTUri_Message{sha256Value, src_appid, src_mytime, src_token, src_ID, src_ChainType}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error"), err
+	}
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+	resp, err := client.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	if err != nil {
 		body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err) + "internel:" + string(body)), err
