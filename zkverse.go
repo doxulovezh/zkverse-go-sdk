@@ -13,6 +13,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -130,6 +131,7 @@ const TestAdministratorPasswordETH string = "!!@@qinfengdx"                     
 const TestCFXAdministratorAddress string = "cfxtest:aakmdj7tutgdy3h558rr5621mhrrx75kfyw3e3sfz0" //测试专用
 // const TestETHAdministratorAddress string = "0xfec36af44b8be6AB6ba97aF3b71940D3f3B8B539"         //测试专用
 var publickey []byte
+var client *http.Client
 
 /**
  * @name:RegByPrivateKey
@@ -191,6 +193,7 @@ func Reg(IPandPort string, APPID string, RegPassword string, flag string) (strin
  * @param {string} filename 加密通信公钥文件路径 public.pem  也可以自己重命名名称
  * @return {*}
  */
+
 func InitRSAPuk(filename string) error {
 	//1. 读取公钥信息 放到data变量中
 	file, err := os.Open(filename)
@@ -202,6 +205,19 @@ func InitRSAPuk(filename string) error {
 	file.Read(data)
 	file.Close()
 	publickey = data
+	//client
+	client = &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 100 * time.Second,
+			}).DialContext,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       60 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+		},
+	}
 	return nil
 }
 func regitPost(IPandPort string, actionName string, myappid string, Password string, flag string) ([]byte, error) {
@@ -220,11 +236,7 @@ func regitPost(IPandPort string, actionName string, myappid string, Password str
 	if err != nil {
 		return []byte(""), err
 	}
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
+
 	resp, err := client.Post(IPandPort+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	if err != nil {
 		// body, err := ioutil.ReadAll(resp.Body)
