@@ -153,8 +153,8 @@ func RegByPrivateKey(IPandPort string, APPID string, RegPassword string, RegPriv
 	if err != nil {
 		return err.Error(), err.Error(), err
 	}
-	fmt.Println("Confluxaddress:", res.Confluxaddress)
-	fmt.Println("ETHaddress:", res.ETHaddress)
+	// fmt.Println("Confluxaddress:", res.Confluxaddress)
+	// fmt.Println("ETHaddress:", res.ETHaddress)
 	return res.Confluxaddress, res.ETHaddress, nil
 }
 
@@ -230,6 +230,7 @@ func regitPost(IPandPort string, actionName string, myappid string, Password str
 		// body, err := ioutil.ReadAll(resp.Body)
 		return body, err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return body, err
@@ -263,6 +264,7 @@ func regitPrkPost(IPandPort string, actionName string, myappid string, Password 
 		// body, err := ioutil.ReadAll(resp.Body)
 		return body, err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return body, err
@@ -309,6 +311,7 @@ func TotalSupplyPost(IPandPort string, actionName string, myappid string, flag s
 		// body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err)), err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return []byte("ReadAll error"), err
@@ -356,6 +359,7 @@ func UserNFTURIPost(thurl string, actionName string, myappid string, id string, 
 		// body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err)), err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return []byte("ReadAll error"), err
@@ -403,6 +407,7 @@ func OwnerOfPost(thurl string, actionName string, myappid string, id string, fla
 		// body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err)), err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return []byte("ReadAll error"), err
@@ -450,6 +455,7 @@ func UserNFTsPost(IPandPort string, actionName string, myappid string, From stri
 		// body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err)), err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return []byte("ReadAll error"), err
@@ -506,7 +512,9 @@ func AdminCreateNFTPost(IPandPort string, actionName string, myappid string, Non
 		// body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err)), err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+
 	if err != nil {
 		return []byte("ReadAll error"), err
 	}
@@ -562,6 +570,7 @@ func AdminCreateNFTBatchPost(IPandPort string, actionName string, myappid string
 		// body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err)), err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return []byte("ReadAll error"), err
@@ -620,6 +629,7 @@ func AdminTransferNFTBatchPost(IPandPort string, actionName string, myappid stri
 		// body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err)), err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return []byte("ReadAll error"), err
@@ -678,6 +688,7 @@ func TransferFromPost(IPandPort string, actionName string, myappid string, Nonce
 		// body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err)), err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return []byte("ReadAll error"), err
@@ -733,6 +744,7 @@ func BurnPost(IPandPort string, actionName string, myappid string, Nonce int64, 
 		// body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err)), err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return []byte("ReadAll error"), err
@@ -789,6 +801,7 @@ func ApprovePost(IPandPort string, actionName string, myappid string, Nonce int6
 		// body, err := ioutil.ReadAll(resp.Body)
 		return []byte("http error:" + fmt.Sprint(err)), err
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return []byte("ReadAll error"), err
