@@ -143,7 +143,7 @@ var client *http.Client
  * @return {*}conflux地址，ETH地址
  */
 func RegByPrivateKey(IPandPort string, APPID string, RegPassword string, RegPrivateKey string, flag string) (string, string, error) {
-	body, err := regitPrkPost(IPandPort, "UserRegitByPrivateKey", APPID, RegPassword, RegPrivateKey, flag)
+	body, err := RegitPrkPost(IPandPort, "UserRegitByPrivateKey", APPID, RegPassword, RegPrivateKey, flag)
 	if err != nil {
 		return string(body), string(body), err
 	}
@@ -170,7 +170,7 @@ func RegByPrivateKey(IPandPort string, APPID string, RegPassword string, RegPriv
 * @return {*}[]byte  string(body)后就是私钥字符串 c81da242b85eb0aef53b641db64fc81c3e366b069436bd415efa546cc45c35ec
 */
 func GetPrivateKey(IPandPort string, APPID string, RegPassword string, AccountAddresss string, flag string) ([]byte, error) {
-	body, err := regitPrkPost(IPandPort, "GetPrivateKey", APPID, RegPassword, AccountAddresss, flag)
+	body, err := RegitPrkPost(IPandPort, "GetPrivateKey", APPID, RegPassword, AccountAddresss, flag)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +193,7 @@ func GetPrivateKey(IPandPort string, APPID string, RegPassword string, AccountAd
  * @return {*}conflux地址，ETH地址
  */
 func Reg(IPandPort string, APPID string, RegPassword string, flag string) (string, string, error) {
-	body, err := regitPost(IPandPort, "UserRegit", APPID, RegPassword, flag)
+	body, err := RegitPost(IPandPort, "UserRegit", APPID, RegPassword, flag)
 	if err != nil {
 		return string(body), string(body), err
 	}
@@ -267,7 +267,7 @@ func InitRSAPuk(pukfilename string) error {
 	}
 	return nil
 }
-func regitPost(IPandPort string, actionName string, myappid string, Password string, flag string) ([]byte, error) {
+func RegitPost(IPandPort string, actionName string, myappid string, Password string, flag string) ([]byte, error) {
 	now := uint64(time.Now().Unix())    //获取当前时间
 	by := make([]byte, 8)               //建立数组
 	binary.BigEndian.PutUint64(by, now) //uint64转数组
@@ -297,7 +297,7 @@ func regitPost(IPandPort string, actionName string, myappid string, Password str
 	}
 	return body, nil
 }
-func regitPrkPost(IPandPort string, actionName string, myappid string, Password string, PrivateKey string, flag string) ([]byte, error) {
+func RegitPrkPost(IPandPort string, actionName string, myappid string, Password string, PrivateKey string, flag string) ([]byte, error) {
 	now := uint64(time.Now().Unix())    //获取当前时间
 	by := make([]byte, 8)               //建立数组
 	binary.BigEndian.PutUint64(by, now) //uint64转数组
