@@ -211,12 +211,12 @@ func Reg(IPandPort string, APPID string, RegPassword string, flag string) (strin
 /**
  * @name:InitRSAPuk
  * @test: test font
- * @msg:初始化与密钥系统的加密通信RSA2018公钥
+ * @msg:初始化与密钥系统的加密通信RSA2048公钥
  * @param {string} filename 加密通信公钥文件路径 public.pem  也可以自己重命名名称
  * @return {*}
  */
 
-func InitRSAPuk(pukfilename string) error {
+func InitRSAPuk(pukfilename string, prkfilename string) error {
 	//1. 读取公钥信息 放到data变量中
 	file, err := os.Open(pukfilename)
 	if err != nil {
@@ -234,24 +234,24 @@ func InitRSAPuk(pukfilename string) error {
 		fmt.Println(err.Error())
 	}
 	publickey = pubInterface.(*rsa.PublicKey)
-	//解密密钥-私钥
-	// //2. 将得到的字符串进行pem解码
-	// file, err = os.Open(prkfilename)
-	// if err != nil {
-	// 	return err
-	// }
-	// stat, _ = file.Stat() //得到文件属性信息
-	// data = make([]byte, stat.Size())
-	// file.Read(data)
-	// file.Close()
-	// block, _ = pem.Decode(data)
-	// // fmt.Println(block)
-	// //3. 使用x509将编码之后的私钥解析出来
-	// privateKey, err3 := x509.ParsePKCS1PrivateKey(block.Bytes)
-	// if err3 != nil {
-	// 	panic(err3)
-	// }
-	// RetrunprivateKey = privateKey
+	// 解密密钥 - 私钥
+	//2. 将得到的字符串进行pem解码
+	file, err = os.Open(prkfilename)
+	if err != nil {
+		return err
+	}
+	stat, _ = file.Stat() //得到文件属性信息
+	data = make([]byte, stat.Size())
+	file.Read(data)
+	file.Close()
+	block, _ = pem.Decode(data)
+	// fmt.Println(block)
+	//3. 使用x509将编码之后的私钥解析出来
+	privateKey, err3 := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err3 != nil {
+		panic(err3)
+	}
+	RetrunprivateKey = privateKey
 	//client
 	client = &http.Client{
 		Transport: &http.Transport{
@@ -267,6 +267,7 @@ func InitRSAPuk(pukfilename string) error {
 	}
 	return nil
 }
+
 func RegitPost(IPandPort string, actionName string, myappid string, Password string, flag string) ([]byte, error) {
 	now := uint64(time.Now().Unix())    //获取当前时间
 	by := make([]byte, 8)               //建立数组
